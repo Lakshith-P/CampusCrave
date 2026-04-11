@@ -242,6 +242,114 @@ class CampusCraveAPITester:
             print(f"  📈 Total orders: {analytics.get('total_orders', 0)}")
             print(f"  💰 Total revenue: ₹{analytics.get('total_revenue', 0)}")
             print(f"  🏪 Venue stats: {len(analytics.get('venue_stats', []))} venues")
+            print(f"  👥 Total users: {analytics.get('total_users', 0)}")
+            print(f"  🎁 Total referrals: {analytics.get('total_referrals', 0)}")
+
+    def test_outlet_analytics_api(self):
+        """Test outlet analytics API"""
+        print("\n🏪 Testing Outlet Analytics API...")
+        
+        if 'outlet_staff' not in self.tokens:
+            print("  ⚠️ Skipping outlet analytics tests - no outlet staff token")
+            return
+
+        headers = {'Authorization': f'Bearer {self.tokens["outlet_staff"]}'}
+        analytics = self.run_test("Get outlet analytics", "GET", "outlet/analytics", 200, headers=headers)
+        
+        if analytics:
+            print(f"  📊 Today's orders: {analytics.get('today_orders', 0)}")
+            print(f"  💰 Today's earnings: ₹{analytics.get('today_earnings', 0)}")
+            print(f"  ⭐ Average rating: {analytics.get('avg_rating', 0)}")
+            print(f"  📈 Net earnings: ₹{analytics.get('net_earnings', 0)}")
+
+    def test_new_features_apis(self):
+        """Test new features APIs (offers, trending, specials, referral, payment)"""
+        print("\n🆕 Testing New Features APIs...")
+        
+        # Test offers API
+        offers = self.run_test("Get offers", "GET", "offers", 200)
+        if offers:
+            print(f"  🎯 Found {len(offers)} offers")
+            
+        # Test trending API
+        trending = self.run_test("Get trending", "GET", "trending", 200)
+        if trending:
+            print(f"  🔥 Found {len(trending)} trending items")
+            
+        # Test specials API (requires auth)
+        if 'student' in self.tokens:
+            headers = {'Authorization': f'Bearer {self.tokens["student"]}'}
+            specials = self.run_test("Get specials", "GET", "specials", 200, headers=headers)
+            if specials:
+                print(f"  ⭐ Found {len(specials)} special items")
+                
+        # Test search API
+        search_results = self.run_test("Search items", "GET", "search?q=pizza", 200)
+        if search_results:
+            print(f"  🔍 Search found {len(search_results)} items for 'pizza'")
+
+    def test_payment_api(self):
+        """Test payment processing API"""
+        print("\n💳 Testing Payment API...")
+        
+        if 'student' not in self.tokens:
+            print("  ⚠️ Skipping payment tests - no student token")
+            return
+
+        headers = {'Authorization': f'Bearer {self.tokens["student"]}'}
+        
+        # Test different payment methods
+        payment_methods = ['upi', 'card', 'wallet', 'credits']
+        
+        for method in payment_methods:
+            payment_data = {
+                "method": method,
+                "amount": 100
+            }
+            
+            result = self.run_test(
+                f"Process payment ({method})",
+                "POST",
+                "payment/process",
+                200,
+                payment_data,
+                headers
+            )
+            
+            if result:
+                print(f"  💰 {method} payment: {result.get('status', 'unknown')} - TXN: {result.get('transaction_id', 'N/A')[:12]}...")
+
+    def test_referral_api(self):
+        """Test referral system API"""
+        print("\n🎁 Testing Referral API...")
+        
+        if 'student' not in self.tokens:
+            print("  ⚠️ Skipping referral tests - no student token")
+            return
+
+        headers = {'Authorization': f'Bearer {self.tokens["student"]}'}
+        
+        # Test applying invalid referral code
+        invalid_code_result = self.run_test(
+            "Apply invalid referral code",
+            "POST",
+            "referral/apply",
+            404,  # Should fail with 404
+            {"code": "INVALID123"},
+            headers
+        )
+        
+        # Test applying own referral code (should fail)
+        user = self.users.get('student', {})
+        if user.get('referral_code'):
+            own_code_result = self.run_test(
+                "Apply own referral code",
+                "POST", 
+                "referral/apply",
+                400,  # Should fail with 400
+                {"code": user['referral_code']},
+                headers
+            )
 
     def test_external_pickup(self):
         """Test external pickup API"""
@@ -297,9 +405,13 @@ class CampusCraveAPITester:
         
         # Test core APIs
         self.test_venues_api()
+        self.test_new_features_apis()
         self.test_cart_operations()
+        self.test_payment_api()
         self.test_order_operations()
+        self.test_referral_api()
         self.test_analytics_api()
+        self.test_outlet_analytics_api()
         self.test_external_pickup()
         self.test_file_upload()
         

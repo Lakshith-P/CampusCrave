@@ -4,9 +4,10 @@ import { FoodBrowsing } from '../components/FoodBrowsing';
 import { Cart } from '../components/Cart';
 import { OrderTracking } from '../components/OrderTracking';
 import { ExternalPickup } from '../components/ExternalPickup';
+import { ReferralPage } from '../components/ReferralPage';
 import { VoiceCommand } from '../components/VoiceCommand';
 import { Button } from '../components/ui/button';
-import { ShoppingCart, Package, LogOut, User, Truck, Search } from 'lucide-react';
+import { ShoppingCart, Package, LogOut, User, Truck, Search, Gift } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
 
 export const StudentDashboard = () => {
@@ -22,6 +23,10 @@ export const StudentDashboard = () => {
     if (command.type === 'navigate') {
       if (command.target === 'cart') setActiveTab('cart');
       if (command.target === 'orders') setActiveTab('orders');
+      if (command.target === 'referral') setActiveTab('referral');
+    }
+    if (command.type === 'cart_updated') {
+      setCartCount(prev => prev + 1);
     }
   };
 
@@ -30,6 +35,7 @@ export const StudentDashboard = () => {
     { id: 'cart', label: 'Cart', icon: ShoppingCart },
     { id: 'orders', label: 'Orders', icon: Package },
     { id: 'pickup', label: 'Pickup', icon: Truck },
+    { id: 'referral', label: 'Refer & Earn', icon: Gift },
   ];
 
   return (
@@ -101,6 +107,7 @@ export const StudentDashboard = () => {
         {activeTab === 'cart' && <Cart cartCount={cartCount} onCartUpdate={handleCartUpdate} />}
         {activeTab === 'orders' && <OrderTracking />}
         {activeTab === 'pickup' && <ExternalPickup />}
+        {activeTab === 'referral' && <ReferralPage />}
       </main>
 
       {/* Voice Command Button */}

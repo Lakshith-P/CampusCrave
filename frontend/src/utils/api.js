@@ -5,49 +5,37 @@ export const API = `${BACKEND_URL}/api`;
 
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  };
+  return { headers: { Authorization: `Bearer ${token}` } };
 };
 
 export const api = {
-  // Venues
   getVenues: (type = null) => axios.get(`${API}/venues${type ? `?type=${type}` : ''}`),
   getMenu: (venueId) => axios.get(`${API}/venues/${venueId}/menu`),
-  
-  // Cart
+  searchItems: (q) => axios.get(`${API}/search?q=${encodeURIComponent(q)}`),
+  getOffers: () => axios.get(`${API}/offers`),
+  getTrending: () => axios.get(`${API}/trending`),
+  getSpecials: () => axios.get(`${API}/specials`, getAuthHeaders()),
+  getMe: () => axios.get(`${API}/auth/me`, getAuthHeaders()),
   getCart: () => axios.get(`${API}/cart`, getAuthHeaders()),
   addToCart: (item) => axios.post(`${API}/cart`, item, getAuthHeaders()),
+  updateCartItem: (itemId, data) => axios.patch(`${API}/cart/${itemId}`, data, getAuthHeaders()),
   removeFromCart: (itemId) => axios.delete(`${API}/cart/${itemId}`, getAuthHeaders()),
-  
-  // Orders
+  processPayment: (data) => axios.post(`${API}/payment/process`, data, getAuthHeaders()),
   createOrder: (order) => axios.post(`${API}/orders`, order, getAuthHeaders()),
   getOrders: (venueId = null) => axios.get(`${API}/orders${venueId ? `?venue_id=${venueId}` : ''}`, getAuthHeaders()),
   updateOrderStatus: (orderId, status) => axios.patch(`${API}/orders/${orderId}/status`, { status }, getAuthHeaders()),
-  updateAgentLocation: (orderId, location) => axios.patch(`${API}/orders/${orderId}/location`, location),
-  
-  // Reviews
   createReview: (review) => axios.post(`${API}/reviews`, review, getAuthHeaders()),
   getReviews: (venueId) => axios.get(`${API}/reviews/${venueId}`),
-  
-  // Upload
   uploadFile: (file) => {
     const formData = new FormData();
     formData.append('file', file);
     return axios.post(`${API}/upload`, formData, {
       ...getAuthHeaders(),
-      headers: {
-        ...getAuthHeaders().headers,
-        'Content-Type': 'multipart/form-data'
-      }
+      headers: { ...getAuthHeaders().headers, 'Content-Type': 'multipart/form-data' }
     });
   },
-  
-  // External Orders
   createExternalOrder: (order) => axios.post(`${API}/external-orders`, order, getAuthHeaders()),
-  
-  // Analytics
-  getAnalytics: () => axios.get(`${API}/analytics`, getAuthHeaders())
+  applyReferral: (code) => axios.post(`${API}/referral/apply`, { code }, getAuthHeaders()),
+  getOutletAnalytics: () => axios.get(`${API}/outlet/analytics`, getAuthHeaders()),
+  getAnalytics: () => axios.get(`${API}/analytics`, getAuthHeaders()),
 };
