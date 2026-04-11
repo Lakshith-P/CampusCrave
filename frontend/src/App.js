@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
@@ -50,6 +50,12 @@ const DashboardRouter = () => {
 };
 
 function App() {
+  useEffect(() => {
+    // Remove external branding elements
+    const badge = document.getElementById('emergent-badge');
+    if (badge) badge.remove();
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>

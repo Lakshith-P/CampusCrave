@@ -58,7 +58,7 @@ export const FoodBrowsing = ({ onAddToCart }) => {
       await api.addToCart({ menu_item_id: selectedItem.id, quantity, special_instructions: instructions });
       toast.success(`Added ${quantity}x ${selectedItem.name} to cart!`);
       onAddToCart();
-      setSelectedItem(null); setQuantity(1); setInstructions(''); setShowVideo(false);
+      setSelectedItem(null); setSelectedVenue(null); setMenuItems([]); setQuantity(1); setInstructions(''); setShowVideo(false);
     } catch(e) { toast.error('Failed to add to cart'); }
   };
 

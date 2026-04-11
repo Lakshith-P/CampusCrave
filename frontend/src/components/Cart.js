@@ -43,6 +43,7 @@ export const Cart = ({ cartCount, onCartUpdate }) => {
   const handleProceedToPayment = () => {
     if (!deliveryLocation) { toast.error('Please select a delivery location'); return; }
     if (cartItems.length === 0) { toast.error('Your cart is empty'); return; }
+    loadUser(); // Refresh credits before showing payment
     setShowCheckout(false);
     setShowPayment(true);
   };
@@ -190,7 +191,7 @@ export const Cart = ({ cartCount, onCartUpdate }) => {
             </div>
 
             <Button data-testid="confirm-payment-btn" onClick={handlePayment} disabled={loading} className="w-full rounded-full py-5 font-bold text-lg" style={{ backgroundColor: '#F97316', color: 'white' }}>
-              {loading ? 'Processing...' : `Pay &#8377;${total.toFixed(0)}`}
+              {loading ? 'Processing...' : `Pay \u20B9${total.toFixed(0)}`}
             </Button>
           </div>
         </DialogContent>
