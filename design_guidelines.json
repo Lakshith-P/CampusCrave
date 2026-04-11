@@ -1,0 +1,166 @@
+{
+  "project_name": "CampusCrave",
+  "theme_and_archetype": {
+    "domain": "University Campus Food & Provision Delivery",
+    "student_app": {
+      "theme": "light",
+      "archetype": "Archetype 6 (Vibrant Play) + Neo-Brutalism Contrast",
+      "description": "High energy, vibrant, Gen Z focused. Uses bold colors, pastel backgrounds, and stark black borders for a trendy, accessible feel."
+    },
+    "outlet_dashboard": {
+      "theme": "light",
+      "archetype": "Archetype 4 (Swiss & High-Contrast)",
+      "description": "Functional, distraction-free Kanban board. Prioritizes legibility, large touch targets, and clear status indicators."
+    },
+    "admin_analytics": {
+      "theme": "dark",
+      "archetype": "Dark Mode Analytics (similar to Jewel & Luxury but tech-focused)",
+      "description": "Deep charcoal background, glassmorphism cards, and electric blue/neon accents for data visualization clarity."
+    }
+  },
+  "typography": {
+    "anti_default_rule": true,
+    "collections": {
+      "student_app": {
+        "headings": "Outfit",
+        "body": "Nunito",
+        "rationale": "Outfit provides geometric friendliness, while Nunito's rounded shapes enhance the 'Vibrant Play' aesthetic."
+      },
+      "dashboards": {
+        "headings": "Chivo",
+        "body": "IBM Plex Sans",
+        "rationale": "Chivo is commanding for data and admin panels. IBM Plex Sans provides high legibility for dense kanban boards and analytics."
+      }
+    },
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter leading-tight",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-snug",
+      "h3": "text-xl sm:text-2xl font-semibold tracking-tight",
+      "body": "text-base leading-relaxed",
+      "labels": "text-xs font-bold uppercase tracking-[0.2em]"
+    }
+  },
+  "colors": {
+    "student_app": {
+      "background": "#FEFCE8",
+      "surface": "#FFFFFF",
+      "primary": "#F97316",
+      "primary_hover": "#EA580C",
+      "secondary": "#FBBF24",
+      "text_main": "#09090B",
+      "text_muted": "#52525B",
+      "border": "#000000"
+    },
+    "outlet_dashboard": {
+      "background": "#F3F4F6",
+      "surface": "#FFFFFF",
+      "primary": "#2563EB",
+      "status_preparing": "#F59E0B",
+      "status_ready": "#10B981",
+      "text_main": "#111827",
+      "border": "#E5E7EB"
+    },
+    "admin_analytics": {
+      "background": "#0A0A0A",
+      "surface": "rgba(255, 255, 255, 0.05)",
+      "primary": "#3B82F6",
+      "accent": "#F59E0B",
+      "text_main": "#F8FAFC",
+      "text_muted": "#94A3B8",
+      "border": "rgba(255, 255, 255, 0.1)"
+    }
+  },
+  "layout_and_spacing": {
+    "philosophy": "Generous Spacing Philosophy (2-3x typical)",
+    "student_app": {
+      "grid": "Bento Grid (Mode A: Tetris) for food court browsing. Asymmetrical layout mixing spans.",
+      "cards": "Neo-brutalist: rounded-2xl, border-2 border-black, shadow-[4px_4px_0px_0px_rgba(0,0,0,1)].",
+      "spacing": "p-6 to p-8 inside cards. gap-6 to gap-8 between sections."
+    },
+    "outlet_dashboard": {
+      "grid": "CSS Grid for Kanban: grid-cols-1 md:grid-cols-4 gap-4. h-screen overflow-hidden.",
+      "cards": "Flat solid background, 1px subtle border, no heavy shadow. sharp edges (rounded-md).",
+      "spacing": "Dense padding (p-4)."
+    },
+    "admin_analytics": {
+      "grid": "Mode B: Control Room Grid. grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6.",
+      "cards": "Glassmorphism: backdrop-blur-xl, border-white/10, soft ambient shadow.",
+      "spacing": "p-6 inside widgets."
+    }
+  },
+  "components_strategy": {
+    "ui_library": "Shadcn UI heavily customized via Tailwind",
+    "icons": "lucide-react for default, @phosphor-icons/react for dashboards (duotone).",
+    "student_features": {
+      "voice_command": "Persistent floating mic button. Uses framer-motion for pulsing animation (ring-4 ring-primary/50) and waveform visualizer during active listening.",
+      "smart_cart": "Sticky bottom bar on mobile, floating side panel on desktop. Smooth layout transitions using framer-motion. Uses Sonner for confetti/success toast on checkout.",
+      "live_tracking": "Custom SVG campus map. Animate a map pin along SVG path. Timeline uses vertical border-l-2 with pulsing dots for active state.",
+      "food_modals": "Shadcn Dialog. Mobile-first (max-h-[80vh] overflow-y-auto). Contains embedded video placeholder (aspect-video bg-muted) and grid for nutrition facts."
+    },
+    "outlet_features": {
+      "kanban_board": "Drag-and-drop functionality (react-beautiful-dnd or dnd-kit). Visual flash alert (CSS keyframe flash-green) and audio chime (HTML5 Audio) on new order.",
+      "cards": "Include large typography for timer (elapsed time) and clear status toggles."
+    },
+    "admin_features": {
+      "analytics": "Shadcn Charts / Recharts. Dark mode styling with grid lines at opacity 0.1. Tooltips must have dark glassmorphism background."
+    },
+    "testing": "All interactive elements MUST have data-testid (e.g., data-testid='voice-command-btn', data-testid='add-to-cart-btn')."
+  },
+  "media_and_images": {
+    "usage_rules": "Main agent MUST use these exact URLs. No placeholders allowed. Preserve aspect ratios with object-cover.",
+    "images": {
+      "pizza_category": [
+        {
+          "url": "https://images.unsplash.com/photo-1773620496832-9b62e8912452?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHw0fHxkZWxpY2lvdXMlMjBwaXp6YSUyMHNsaWNlJTIwcGhvdG9ncmFwaHl8ZW58MHx8fHwxNzc1OTE5MzIzfDA&ixlib=rb-4.1.0&q=85",
+          "description": "Dominos/Pizza item thumbnail"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1767065603803-a41d2e25a34c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwyfHxkZWxpY2lvdXMlMjBwaXp6YSUyMHNsaWNlJTIwcGhvdG9ncmFwaHl8ZW58MHx8fHwxNzc1OTE5MzIzfDA&ixlib=rb-4.1.0&q=85",
+          "description": "Pizza slice detail view"
+        }
+      ],
+      "indian_thali_category": [
+        {
+          "url": "https://images.unsplash.com/photo-1559561724-732dbca7be1e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzB8MHwxfHNlYXJjaHwyfHxpbmRpYW4lMjB0aGFsaSUyMGZvb2QlMjBwaG90b2dyYXBoeXxlbnwwfHx8fDE3NzU5MTkzMjN8MA&ixlib=rb-4.1.0&q=85",
+          "description": "Punjabi Tadka hero banner"
+        }
+      ],
+      "burger_category": [
+        {
+          "url": "https://images.unsplash.com/photo-1763689389824-dd2cea2e5772?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxidXJnZXIlMjBhbmQlMjBmcmllcyUyMGNvbWJvfGVufDB8fHx8MTc3NTkxOTMyOXww&ixlib=rb-4.1.0&q=85",
+          "description": "Hangouts Burger combo"
+        }
+      ],
+      "provision_store_category": [
+        {
+          "url": "https://images.unsplash.com/photo-1739065882957-7db99eaf9a08?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwyfHxncm9jZXJ5JTIwc3RvcmUlMjBzbmFja3MlMjBzdGF0aW9ufGVufDB8fHx8MTc3NTkxOTMyOXww&ixlib=rb-4.1.0&q=85",
+          "description": "Campus Mart banner"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1765741836929-af2f9e1968e8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwxfHxncm9jZXJ5JTIwc3RvcmUlMjBzbmFja3MlMjBzdGF0aW9ufGVufDB8fHx8MTc3NTkxOTMyOXww&ixlib=rb-4.1.0&q=85",
+          "description": "Night Store snacks"
+        }
+      ],
+      "campus_students": [
+        {
+          "url": "https://images.pexels.com/photos/32213218/pexels-photo-32213218.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+          "description": "Student avatar / Login background"
+        },
+        {
+          "url": "https://images.pexels.com/photos/31070772/pexels-photo-31070772.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+          "description": "Campus overview hero for landing page"
+        }
+      ]
+    }
+  },
+  "instructions_to_main_agent": {
+    "1": "Implement three distinct layouts based on the active role (Student, Outlet, Admin). Use Next.js layout patterns or conditional rendering at the root app shell.",
+    "2": "For the Student app, strictly follow the Neo-brutalist styling: hard black borders (border-2 border-black), solid shadows, pastel backgrounds, and rounded corners.",
+    "3": "For the Outlet Kanban, prioritize dense information display. Do not use rounded cards or heavy shadows. Use distinct colors for order status tags.",
+    "4": "For Admin Analytics, implement a dark mode theme. Use glassmorphism for cards (backdrop-blur-xl bg-white/5).",
+    "5": "Integrate Web Speech API for the voice command button. It must be visually prominent and animated when active.",
+    "6": "Live tracking requires a custom SVG map component. Create an SVG representing the campus and map order progress along its paths.",
+    "7": "Use the provided Unsplash/Pexels image URLs for all food, store, and student references. DO NOT USE placeholder text or generic grey boxes.",
+    "8": "Add data-testid to all buttons, links, inputs, and major containers."
+  }
+}
