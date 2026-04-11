@@ -20,6 +20,7 @@ export const Cart = ({ cartCount, onCartUpdate }) => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [deliveryLocation, setDeliveryLocation] = useState('');
+  const [orderType, setOrderType] = useState('delivery');
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [loading, setLoading] = useState(false);
   const [userCredits, setUserCredits] = useState(100);
@@ -41,7 +42,7 @@ export const Cart = ({ cartCount, onCartUpdate }) => {
   const getTotalAmount = () => cartItems.reduce((sum, item) => sum + ((item.menu_item?.price || 0) * item.quantity), 0);
 
   const handleProceedToPayment = () => {
-    if (!deliveryLocation) { toast.error('Please select a delivery location'); return; }
+    if (orderType === 'delivery' && !deliveryLocation) { toast.error('Please select a delivery location'); return; }
     if (cartItems.length === 0) { toast.error('Your cart is empty'); return; }
     loadUser(); // Refresh credits before showing payment
     setShowCheckout(false);
@@ -73,7 +74,7 @@ export const Cart = ({ cartCount, onCartUpdate }) => {
           price: item.menu_item?.price, special_instructions: item.special_instructions, image_url: item.menu_item?.image_url
         }));
         const totalAmount = items.reduce((sum, item) => sum + (item.menu_item?.price * item.quantity), 0);
-        await api.createOrder({ items: orderItems, total_amount: totalAmount, delivery_location: deliveryLocation, venue_id: venueId, payment_method: paymentMethod });
+        await api.createOrder({ items: orderItems, total_amount: totalAmount, delivery_location: orderType === 'takeaway' ? 'Takeaway' : deliveryLocation, venue_id: venueId, payment_method: paymentMethod });
       }
 
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#F97316', '#FBBF24', '#10B981'] });
@@ -140,13 +141,32 @@ export const Cart = ({ cartCount, onCartUpdate }) => {
       {/* Location Selection */}
       <Dialog open={showCheckout} onOpenChange={setShowCheckout}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle className="text-xl font-bold" style={{ fontFamily: 'Outfit' }}>Delivery Location</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="text-xl font-bold" style={{ fontFamily: 'Outfit' }}>Checkout</DialogTitle></DialogHeader>
           <div className="space-y-4 mt-4">
-            <Select value={deliveryLocation} onValueChange={setDeliveryLocation}>
-              <SelectTrigger data-testid="location-select" className="border-2 border-black rounded-lg"><SelectValue placeholder="Choose your block / hostel" /></SelectTrigger>
-              <SelectContent>{locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}</SelectContent>
-            </Select>
-            <p className="text-xs text-gray-500 flex items-center gap-1"><Clock className="w-3 h-3" /> Estimated delivery: 20-25 mins</p>
+            {/* Order Type */}
+            <div>
+              <label className="font-semibold text-sm mb-2 block">Order Type</label>
+              <div className="flex gap-3">
+                {[{id:'delivery',label:'Delivery',desc:'To your hostel/block'},{id:'takeaway',label:'Takeaway',desc:'Pick up yourself'}].map(t => (
+                  <button key={t.id} data-testid={`order-type-${t.id}`} onClick={() => setOrderType(t.id)}
+                    className={`flex-1 p-3 rounded-xl border-2 text-center transition-all ${orderType === t.id ? 'border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]' : 'border-gray-200'}`}
+                    style={{ backgroundColor: orderType === t.id ? '#FEF3C7' : '#FFF' }}>
+                    <p className="font-bold text-sm">{t.label}</p>
+                    <p className="text-xs text-gray-500">{t.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Location - only for delivery */}
+            {orderType === 'delivery' && (
+              <Select value={deliveryLocation} onValueChange={setDeliveryLocation}>
+                <SelectTrigger data-testid="location-select" className="border-2 border-black rounded-lg"><SelectValue placeholder="Choose your block / hostel" /></SelectTrigger>
+                <SelectContent>{locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}</SelectContent>
+              </Select>
+            )}
+
+            <p className="text-xs text-gray-500 flex items-center gap-1"><Clock className="w-3 h-3" /> {orderType === 'delivery' ? 'Estimated delivery: 20-25 mins' : 'Ready for pickup: 15-20 mins'}</p>
             <Button data-testid="proceed-to-payment-btn" onClick={handleProceedToPayment} className="w-full rounded-full py-5 font-bold" style={{ backgroundColor: '#F97316', color: 'white' }}>Choose Payment Method</Button>
           </div>
         </DialogContent>

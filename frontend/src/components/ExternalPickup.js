@@ -1,202 +1,145 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Upload, Package, Clock, MapPin } from 'lucide-react';
+import { Upload, Clock, MapPin, Package, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
+
+const PLATFORMS = ['Blinkit', 'Swiggy Instamart', 'Amazon', 'Flipkart', 'Zepto', 'BigBasket', 'Myntra', 'Meesho'];
+const LOCATIONS = ['Block 1','Block 2','Block 3','Block 5','Block 10','Block 15','Block 20','Block 25','Block 30','Block 40','Block 50','Block 60','Boys Hostel','Girls Hostel'];
 
 export const ExternalPickup = () => {
   const [showForm, setShowForm] = useState(false);
+  const [platform, setPlatform] = useState('');
+  const [orderId, setOrderId] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [deliveryLocation, setDeliveryLocation] = useState('');
+  const [isPaid, setIsPaid] = useState('yes');
   const [screenshotPreview, setScreenshotPreview] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const locations = [
-    'Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5',
-    'Block 10', 'Block 15', 'Block 20', 'Block 25', 'Block 30',
-    'Boys Hostel', 'Girls Hostel'
-  ];
 
   const handleScreenshotSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setScreenshotPreview(reader.result);
-      };
+      reader.onloadend = () => setScreenshotPreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = async () => {
-    if (!screenshotPreview || !deliveryTime || !deliveryLocation) {
-      toast.error('Please fill all fields');
-      return;
-    }
-
+    if (!platform || !deliveryTime || !deliveryLocation) { toast.error('Fill all required fields'); return; }
     setLoading(true);
     try {
       await api.createExternalOrder({
-        screenshot_url: screenshotPreview,
+        screenshot_url: screenshotPreview || '',
         delivery_time: deliveryTime,
-        delivery_location: deliveryLocation
+        delivery_location: deliveryLocation,
+        platform,
+        order_id: orderId,
+        is_paid: isPaid === 'yes'
       });
-      toast.success('Pickup request submitted! An agent will collect your package.');
+      toast.success('Pickup request submitted!');
       setShowForm(false);
-      setScreenshotPreview(null);
-      setDeliveryTime('');
-      setDeliveryLocation('');
-    } catch (error) {
-      toast.error('Failed to submit request');
-    } finally {
-      setLoading(false);
-    }
+      setPlatform(''); setOrderId(''); setDeliveryTime(''); setDeliveryLocation(''); setScreenshotPreview(null); setIsPaid('yes');
+    } catch(e) { toast.error('Failed to submit'); }
+    finally { setLoading(false); }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold" style={{ fontFamily: 'Outfit', color: '#09090B' }}>
-            External Pickup
-          </h2>
-          <p className="text-sm mt-1" style={{ color: '#52525B' }}>
-            Get your Blinkit, Swiggy, Amazon packages delivered to your hostel
-          </p>
+          <h2 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'Outfit', color: '#09090B' }}>External Pickup</h2>
+          <p className="text-sm mt-1" style={{ color: '#52525B' }}>Get packages from Blinkit, Amazon, etc. delivered to your hostel</p>
         </div>
-        <Button
-          data-testid="new-pickup-request-btn"
-          onClick={() => setShowForm(true)}
-          className="rounded-full px-6 py-3 font-bold"
-          style={{ backgroundColor: '#F97316', color: 'white' }}
-        >
-          <Upload className="w-5 h-5 mr-2" />
-          New Pickup Request
+        <Button data-testid="new-pickup-request-btn" onClick={() => setShowForm(true)} className="rounded-full px-5 py-3 font-bold" style={{ backgroundColor: '#F97316', color: 'white', border: '2px solid #000', boxShadow: '3px 3px 0px rgba(0,0,0,1)' }}>
+          <Upload className="w-4 h-4 mr-2" /> New Request
         </Button>
       </div>
 
-      {/* How it works */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="neo-brutal rounded-2xl p-6" style={{ backgroundColor: '#FFFFFF' }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
-              <Upload className="w-5 h-5" style={{ color: '#F97316' }} />
+      {/* Steps */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[
+          { step: '1', icon: Upload, text: 'Select platform & upload screenshot', color: '#3B82F6' },
+          { step: '2', icon: Clock, text: 'Enter arrival time at LPU gate', color: '#F97316' },
+          { step: '3', icon: Package, text: 'Agent picks up & delivers to you!', color: '#10B981' },
+        ].map(s => (
+          <Card key={s.step} className="neo-brutal rounded-2xl p-5" style={{ backgroundColor: '#FFFFFF' }}>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: s.color }}>{s.step}</div>
+              <s.icon className="w-5 h-5" style={{ color: s.color }} />
             </div>
-            <h3 className="font-bold">Step 1</h3>
-          </div>
-          <p className="text-sm" style={{ color: '#52525B' }}>Upload a screenshot of your external order</p>
-        </Card>
-
-        <Card className="neo-brutal rounded-2xl p-6" style={{ backgroundColor: '#FFFFFF' }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
-              <Clock className="w-5 h-5" style={{ color: '#F97316' }} />
-            </div>
-            <h3 className="font-bold">Step 2</h3>
-          </div>
-          <p className="text-sm" style={{ color: '#52525B' }}>Enter estimated arrival time at LPU gate</p>
-        </Card>
-
-        <Card className="neo-brutal rounded-2xl p-6" style={{ backgroundColor: '#FFFFFF' }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FEF3C7' }}>
-              <MapPin className="w-5 h-5" style={{ color: '#F97316' }} />
-            </div>
-            <h3 className="font-bold">Step 3</h3>
-          </div>
-          <p className="text-sm" style={{ color: '#52525B' }}>A campus agent picks it up and delivers to you!</p>
-        </Card>
+            <p className="text-sm font-medium">{s.text}</p>
+          </Card>
+        ))}
       </div>
 
-      {/* Supported Apps */}
-      <Card className="neo-brutal rounded-2xl p-6" style={{ backgroundColor: '#FFFFFF' }}>
-        <h3 className="font-bold text-lg mb-3">Supported Platforms</h3>
-        <div className="flex flex-wrap gap-3">
-          {['Blinkit', 'Swiggy Instamart', 'Amazon', 'Flipkart', 'Zepto', 'BigBasket'].map(app => (
-            <span
-              key={app}
-              className="px-4 py-2 rounded-full text-sm font-medium border-2 border-black"
-              style={{ backgroundColor: '#FEFCE8' }}
-            >
-              {app}
-            </span>
+      {/* Supported Platforms */}
+      <Card className="neo-brutal rounded-2xl p-5" style={{ backgroundColor: '#FFFFFF' }}>
+        <h3 className="font-bold mb-3">Supported Platforms</h3>
+        <div className="flex flex-wrap gap-2">
+          {PLATFORMS.map(app => (
+            <span key={app} className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ backgroundColor: '#FEF3C7', border: '1.5px solid #000' }}>{app}</span>
           ))}
         </div>
       </Card>
 
-      {/* Pickup Form Modal */}
+      {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold" style={{ fontFamily: 'Outfit' }}>
-              New Pickup Request
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 mt-4">
-            {/* Screenshot Upload */}
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+          <DialogHeader><DialogTitle className="text-xl font-bold" style={{ fontFamily: 'Outfit' }}>New Pickup Request</DialogTitle></DialogHeader>
+          <div className="space-y-4 mt-3">
             <div>
-              <label className="font-semibold mb-2 block">Order Screenshot</label>
-              <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-orange-400 transition-colors"
-                onClick={() => document.getElementById('screenshot-input').click()}
-              >
-                {screenshotPreview ? (
-                  <img src={screenshotPreview} alt="Screenshot" className="max-h-48 mx-auto rounded-lg" />
-                ) : (
-                  <div>
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                    <p className="text-sm text-gray-500">Click to upload screenshot</p>
-                  </div>
-                )}
-                <input
-                  id="screenshot-input"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleScreenshotSelect}
-                />
-              </div>
-            </div>
-
-            {/* Delivery Time */}
-            <div>
-              <label className="font-semibold mb-2 block">Expected Arrival Time</label>
-              <Input
-                data-testid="pickup-time-input"
-                type="text"
-                placeholder="e.g., 4:30 PM today"
-                value={deliveryTime}
-                onChange={(e) => setDeliveryTime(e.target.value)}
-                className="border-2 border-black rounded-lg"
-              />
-            </div>
-
-            {/* Delivery Location */}
-            <div>
-              <label className="font-semibold mb-2 block">Your Location</label>
-              <Select value={deliveryLocation} onValueChange={setDeliveryLocation}>
-                <SelectTrigger data-testid="pickup-location-select" className="border-2 border-black rounded-lg">
-                  <SelectValue placeholder="Select your hostel/block" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc} value={loc}>{loc}</SelectItem>
-                  ))}
-                </SelectContent>
+              <label className="font-semibold text-sm mb-1.5 block">Platform *</label>
+              <Select value={platform} onValueChange={setPlatform}>
+                <SelectTrigger data-testid="pickup-platform-select" className="border-2 border-black rounded-lg"><SelectValue placeholder="Where is the order from?" /></SelectTrigger>
+                <SelectContent>{PLATFORMS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
               </Select>
             </div>
 
-            <Button
-              data-testid="submit-pickup-btn"
-              onClick={handleSubmit}
-              disabled={loading}
-              className="w-full rounded-full py-6 text-lg font-bold"
-              style={{ backgroundColor: '#F97316', color: 'white' }}
-            >
+            <div>
+              <label className="font-semibold text-sm mb-1.5 block">Order ID (optional)</label>
+              <Input data-testid="pickup-order-id" value={orderId} onChange={e => setOrderId(e.target.value)} placeholder="e.g., OD1234567890" className="border-2 border-black rounded-lg" />
+            </div>
+
+            <div>
+              <label className="font-semibold text-sm mb-1.5 block">Payment Status *</label>
+              <div className="flex gap-3">
+                <button onClick={() => setIsPaid('yes')} className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${isPaid === 'yes' ? 'border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]' : 'border-gray-200'}`} style={{ backgroundColor: isPaid === 'yes' ? '#F0FDF4' : '#FFF' }}>
+                  <CheckCircle className="w-4 h-4" style={{ color: '#10B981' }} /><span className="text-sm font-semibold">Paid</span>
+                </button>
+                <button onClick={() => setIsPaid('no')} className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${isPaid === 'no' ? 'border-black shadow-[2px_2px_0px_rgba(0,0,0,1)]' : 'border-gray-200'}`} style={{ backgroundColor: isPaid === 'no' ? '#FEF2F2' : '#FFF' }}>
+                  <XCircle className="w-4 h-4" style={{ color: '#EF4444' }} /><span className="text-sm font-semibold">COD</span>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="font-semibold text-sm mb-1.5 block">Expected Arrival *</label>
+              <Input data-testid="pickup-time-input" value={deliveryTime} onChange={e => setDeliveryTime(e.target.value)} placeholder="e.g., 4:30 PM today" className="border-2 border-black rounded-lg" />
+            </div>
+
+            <div>
+              <label className="font-semibold text-sm mb-1.5 block">Your Location *</label>
+              <Select value={deliveryLocation} onValueChange={setDeliveryLocation}>
+                <SelectTrigger data-testid="pickup-location-select" className="border-2 border-black rounded-lg"><SelectValue placeholder="Select hostel/block" /></SelectTrigger>
+                <SelectContent>{LOCATIONS.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="font-semibold text-sm mb-1.5 block">Screenshot (optional)</label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-orange-400 transition-colors" onClick={() => document.getElementById('screenshot-input').click()}>
+                {screenshotPreview ? <img src={screenshotPreview} alt="Screenshot" className="max-h-36 mx-auto rounded-lg" /> : <><Upload className="w-6 h-6 mx-auto mb-1 text-gray-400" /><p className="text-xs text-gray-500">Upload order screenshot</p></>}
+                <input id="screenshot-input" type="file" accept="image/*" className="hidden" onChange={handleScreenshotSelect} />
+              </div>
+            </div>
+
+            <Button data-testid="submit-pickup-btn" onClick={handleSubmit} disabled={loading} className="w-full rounded-full py-5 font-bold" style={{ backgroundColor: '#F97316', color: 'white' }}>
               {loading ? 'Submitting...' : 'Submit Pickup Request'}
             </Button>
           </div>

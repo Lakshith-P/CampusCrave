@@ -23,7 +23,7 @@ const CountdownTimer = ({ expiresAt }) => {
   return <span className="font-mono font-bold text-sm" style={{ color: '#F97316' }}>{timeLeft}</span>;
 };
 
-export const FoodBrowsing = ({ onAddToCart }) => {
+export const FoodBrowsing = ({ onAddToCart, onGoToCart }) => {
   const [venues, setVenues] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
@@ -76,7 +76,10 @@ export const FoodBrowsing = ({ onAddToCart }) => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {offers.map(offer => (
-              <Card key={offer.id} data-testid={`offer-${offer.id}`} className="neo-brutal rounded-2xl overflow-hidden" style={{ backgroundColor: '#FEF3C7' }}>
+              <Card key={offer.id} data-testid={`offer-${offer.id}`} onClick={() => {
+                const v = venues.find(v => v.id === offer.venue_id);
+                if (v) handleVenueClick(v);
+              }} className="neo-brutal rounded-2xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform" style={{ backgroundColor: '#FEF3C7' }}>
                 <img src={offer.image_url} alt={offer.title} className="w-full h-32 object-cover" />
                 <div className="p-4">
                   <h3 className="font-bold text-sm mb-1">{offer.title}</h3>
@@ -104,7 +107,9 @@ export const FoodBrowsing = ({ onAddToCart }) => {
           </div>
           <div className="flex gap-4 overflow-x-auto pb-2">
             {specials.map(item => (
-              <Card key={item.id} data-testid={`special-${item.id}`} onClick={() => setSelectedItem(item)} className="neo-brutal rounded-2xl overflow-hidden cursor-pointer hover:scale-105 transition-transform shrink-0 w-48" style={{ backgroundColor: '#FFFFFF' }}>
+              <Card key={item.id} data-testid={`special-${item.id}`} onClick={async () => {
+                try { await api.addToCart({ menu_item_id: item.id, quantity: 1, special_instructions: '' }); toast.success(`Added ${item.name} to cart!`); onAddToCart(); if(onGoToCart) onGoToCart(); } catch(e) { setSelectedItem(item); }
+              }} className="neo-brutal rounded-2xl overflow-hidden cursor-pointer hover:scale-105 transition-transform shrink-0 w-48" style={{ backgroundColor: '#FFFFFF' }}>
                 <img src={item.image_url} alt={item.name} className="w-48 h-32 object-cover" />
                 <div className="p-3">
                   <h4 className="font-bold text-sm truncate">{item.name}</h4>
