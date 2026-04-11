@@ -1,15 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&family=Chivo:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
     margin: 0;
-    font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-        sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.student-app {
+    font-family: 'Nunito', sans-serif;
+}
+
+.student-app h1,
+.student-app h2,
+.student-app h3 {
+    font-family: 'Outfit', sans-serif;
+}
+
+.dashboard-app {
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.dashboard-app h1,
+.dashboard-app h2,
+.dashboard-app h3 {
+    font-family: 'Chivo', sans-serif;
 }
 
 code {
