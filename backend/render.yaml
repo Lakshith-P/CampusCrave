@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: campuscrave-backend
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: MONGO_URL
+        value: mongodb+srv://admin:admin123@cluster0.i8flkya.mongodb.net/campuscrave
+      - key: DB_NAME
+        value: campuscrave
+      - key: CORS_ORIGINS
+        value: "*"
+    runtime: python-3.11.9
